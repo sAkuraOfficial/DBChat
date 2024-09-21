@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35219.272
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DBChat", "DBChat.vcxproj", "{0D2E1936-0327-4310-9F33-08E24E6097E6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0D2E1936-0327-4310-9F33-08E24E6097E6}.Debug|x64.ActiveCfg = Debug|x64
+		{0D2E1936-0327-4310-9F33-08E24E6097E6}.Debug|x64.Build.0 = Debug|x64
+		{0D2E1936-0327-4310-9F33-08E24E6097E6}.Release|x64.ActiveCfg = Release|x64
+		{0D2E1936-0327-4310-9F33-08E24E6097E6}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3C02C27E-0053-422A-93D1-6BB11CCD9426}
+	EndGlobalSection
+EndGlobal
