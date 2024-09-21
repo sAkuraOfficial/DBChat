@@ -11,6 +11,9 @@ DBChat::DBChat(QString userID, QSqlDatabase *db, QWidget *parent)
     : QWidget(parent), userID(userID), _db(db)
 {
     ui.setupUi(this);
+
+    lastUpdateTime = QDateTime::currentDateTime().addSecs(-200); // 初始化为200秒前
+
     ui.tableWidget->clear();
     ui.tableWidget->setColumnCount(2);
     ui.tableWidget->setHorizontalHeaderLabels(QStringList() << "姓名"
@@ -23,7 +26,7 @@ DBChat::DBChat(QString userID, QSqlDatabase *db, QWidget *parent)
 
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &DBChat::updateUserList);
-    timer->start(1000); // 每1秒自动刷新用户列表
+    timer->start(2000); // 每1秒自动刷新用户列表
 }
 
 DBChat::~DBChat()
@@ -91,6 +94,29 @@ void DBChat::updateUserList()
             userList.append({userID, status});
         }
 
+        // 查询新消息
+        QSqlQuery query_message(*this->_db);
+        query_message.prepare("SELECT senderID, messageContent, sendTime FROM 消息 WHERE sendTime > :lastUpdateTime");
+        query_message.bindValue(":lastUpdateTime", lastUpdateTime);
+        query_message.exec();
+        while (query_message.next())
+        {
+            QString senderID = query_message.value("senderID").toString();
+            QString messageContent = query_message.value("messageContent").toString();
+            QDateTime sendTime = query_message.value("sendTime").toDateTime();
+            // 更新 UI 在主线程
+            QMetaObject::invokeMethod(this, [this, senderID, messageContent, sendTime]() {
+                if (this->isVisible())
+                {
+                    // 添加到 ui.textEdit_msg
+                    ui.textEdit_msg->append(QString("%1 %2: %3\n").arg(sendTime.toString("yyyy-MM-dd hh:mm:ss"), senderID, messageContent));
+                }
+            });
+        }
+
+        // 更新最后更新时间
+        lastUpdateTime = QDateTime::currentDateTime();
+
         // 更新 UI 在主线程
         QMetaObject::invokeMethod(this, [this, userList]() {
             if (this->isVisible())
@@ -106,4 +132,21 @@ void DBChat::updateUserList()
             }
         });
     });
+}
+
+void DBChat::on_pushButton_send_clicked()
+{
+    QString message = ui.textEdit_input->toPlainText();
+    if (message.isEmpty())
+        return;
+    QSqlQuery query(*_db);
+    QDateTime time = QDateTime::currentDateTime(); // 获取系统现在的时间
+    query.prepare("INSERT INTO 消息 (senderID, messageContent, sendTime) VALUES (:senderID, :messageContent, :sendTime)");
+    query.bindValue(":senderID", userID);
+    query.bindValue(":messageContent", message);
+    query.bindValue(":sendTime", time);
+    if (query.exec())
+        ui.textEdit_input->clear();
+    else
+        QMessageBox::warning(this, "发送失败", query.lastError().text());
 }

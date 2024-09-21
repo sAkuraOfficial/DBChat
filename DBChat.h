@@ -18,12 +18,15 @@ class DBChat : public QWidget
     void closeEvent(QCloseEvent *event) override;
 
   private:
-    void updateUserOnlineStatus(int status); // 添加这一行
+    void updateUserOnlineStatus(int status);
     void updateUserList();
 
     Ui::DBChatClass ui;
     QString userID;
     QSqlDatabase *_db;
     QTimer *timer;
-  
+    QDateTime lastUpdateTime; // 上次更新用户列表的时间
+
+  private slots:
+    void on_pushButton_send_clicked();
 };
